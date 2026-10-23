@@ -2,345 +2,541 @@
 
 ### LM358-Based Analog Signal Conditioning for Photoplethysmography
 
-An analog front-end (AFE) circuit designed to amplify and filter photoplethysmography (PPG) signals using LM358 operational amplifiers and passive RC filters.
+Design and simulation of an analog front-end (AFE) for photoplethysmography (PPG) signal acquisition using LM358 operational amplifiers and passive RC filters.
 
-This project focuses on **analog circuit design, SPICE simulation, and hardware validation**. The goal is to acquire a PPG signal from an optical pulse sensor and condition it using a custom analog circuit without relying on a microcontroller or digital signal processing.
+The circuit is designed to amplify low-amplitude PPG signals, attenuate unwanted DC components, and reduce high-frequency interference.
 
-**Project Status:** PSpice Simulation Completed | Hardware Implementation Planned
+This project focuses on **analog circuit design, SPICE simulation, and experimental hardware verification**, without relying on microcontrollers or digital signal processing.
+
+**Project Status:** Simulation Completed | Hardware Implementation Planned
 
 ---
 
 ## 1. Project Overview
 
-Photoplethysmography (PPG) is an optical measurement technique that detects changes in blood volume through variations in light absorption or reflection.
+Photoplethysmography (PPG) is an optical sensing technique that detects changes in blood volume by measuring variations in transmitted or reflected light.
 
-A PPG sensor typically produces a signal containing a small pulsatile component along with a DC component and unwanted interference.
+A typical PPG signal contains a small pulsatile AC component superimposed on a relatively large DC component. Noise and interference can make direct measurement difficult.
 
-To extract the pulsatile signal, an analog front-end is designed to perform three main functions:
+To condition the signal, this project implements an analog front-end consisting of:
 
-- **DC Removal:** Attenuate unwanted DC and low-frequency components.
-- **Signal Amplification:** Amplify low-amplitude PPG signals using operational amplifiers.
-- **Noise Filtering:** Attenuate high-frequency interference while preserving the desired pulse waveform.
+- **High-Pass Filters (HPFs):** Remove DC components and attenuate low-frequency variations.
+- **Non-Inverting Amplifiers:** Amplify the low-amplitude pulsatile signal.
+- **Low-Pass Filter (LPF):** Attenuate high-frequency interference.
+- **Voltage Reference Buffer:** Establish a stable bias voltage for single-supply operation.
 
-The final objective is to construct the circuit using discrete components and observe the conditioned PPG waveform directly with an oscilloscope.
+The final objective is to build the circuit using discrete components and observe a real PPG waveform from a KY-039 optical pulse sensor using an oscilloscope.
 
 ## 2. System Architecture
 
-The proposed system consists of two high-pass filters, two non-inverting amplification stages, and one low-pass filter.
+The signal-processing chain consists of two RC high-pass filters, two LM358 non-inverting amplifier stages, and one RC low-pass filter.
+
+**Signal Flow:**
 
 ```text
-       PPG Sensor (KY-039)
-               |
-               v
-       High-Pass Filter 1
-          fc = 0.482 Hz
-               |
-               v
-       Non-Inverting Amp 1
-            Gain = 11
-               |
-               v
-       High-Pass Filter 2
-          fc = 0.482 Hz
-               |
-               v
-       Non-Inverting Amp 2
-            Gain = 11
-               |
-               v
-        Low-Pass Filter
-          fc = 4.823 Hz
-               |
-               v
-             VOUT
-               |
-               v
-          Oscilloscope
+PPG Sensor (KY-039)
+        |
+        v
+High-Pass Filter 1
+  fc = 0.482 Hz
+        |
+        v
+Non-Inverting Amplifier 1
+     Gain = 11
+        |
+        v
+High-Pass Filter 2
+  fc = 0.482 Hz
+        |
+        v
+Non-Inverting Amplifier 2
+     Gain = 11
+        |
+        v
+ Low-Pass Filter
+  fc = 4.823 Hz
+        |
+        v
+       VOUT
+        |
+        v
+   Oscilloscope
 ```
 
-A separate voltage reference circuit provides a stable bias for the analog signal-processing stages.
+A separate LM358 voltage follower generates a buffered reference voltage for the analog signal-processing stages.
+
+### Complete Circuit Schematic
+
+![Complete PPG Analog Front-End Schematic](images/full_circuit.png)
+
+*Figure 1. Complete PPG analog front-end designed in PSpice for TI, including the voltage reference, two HPFs, two amplifier stages, and an LPF.*
 
 ### Design Specifications
 
-| Parameter | Design Value |
+| Parameter | Value |
 |---|---|
 | Supply Voltage | 5 V DC |
 | Operational Amplifier | LM358 |
 | Reference Voltage | Approximately 1.667 V |
 | HPF1 Cutoff Frequency | 0.482 Hz |
-| First Amplifier Gain | 11 V/V |
+| Amplifier 1 Gain | 11 V/V |
 | HPF2 Cutoff Frequency | 0.482 Hz |
-| Second Amplifier Gain | 11 V/V |
+| Amplifier 2 Gain | 11 V/V |
 | LPF Cutoff Frequency | 4.823 Hz |
 | Nominal Cascaded Amplifier Gain | 121 V/V |
-| Intended Sensor | KY-039 PPG Sensor |
+| Intended PPG Sensor | KY-039 |
 | Output Measurement | Oscilloscope |
 
-The actual overall gain depends on signal frequency due to attenuation introduced by the filters.
+The actual overall gain depends on the signal frequency because of the high-pass and low-pass filter responses.
 
-## 3. Circuit Design
+---
+
+## 3. Analog Circuit Design
 
 ### 3.1 Voltage Reference
 
-Because the circuit operates from a single 5 V supply, a DC reference voltage is required for signal conditioning.
+The circuit operates from a single 5 V power supply.
 
-A resistor divider generates approximately 1.667 V:
+A voltage divider consisting of $R_1 = 20\,k\Omega$ and $R_2 = 10\,k\Omega$ generates the reference voltage.
 
-\[
+$$
 V_{REF}=V_{CC}\frac{R_2}{R_1+R_2}
-\]
+$$
 
-With \(R_1=20\,k\Omega\) and \(R_2=10\,k\Omega\):
+$$
+V_{REF}=5\frac{10k}{20k+10k}
+\approx1.667\,V
+$$
 
-\[
-V_{REF}\approx1.667\,V
-\]
+An LM358 voltage follower buffers the reference voltage, providing a low-output-impedance bias source for subsequent stages.
 
-An LM358 voltage follower buffers this reference for use by the subsequent stages.
+**Simulation Result:** $V_{REF}=1.666742\,V$
 
 ### 3.2 High-Pass Filters
 
-Two RC high-pass filters are used to attenuate DC components and low-frequency variations.
+Two first-order RC high-pass filters are used to attenuate DC components and low-frequency variations.
 
-Each filter uses:
+Each filter consists of:
 
-- Resistor: 330 kΩ
-- Capacitor: 1 µF
+| Component | Value |
+|---|---|
+| Resistor | 330 kΩ |
+| Capacitor | 1 µF |
 
-The cutoff frequency is:
+The cutoff frequency is calculated as:
 
-\[
-f_c=\frac{1}{2\pi RC}\approx0.482\,Hz
-\]
+$$
+f_{c,HPF}=\frac{1}{2\pi RC}
+$$
 
-The second HPF also prevents the DC offset produced by the first amplification stage from being directly amplified by the second stage.
+$$
+f_{c,HPF}
+=\frac{1}{2\pi(330k)(1\mu F)}
+\approx0.482\,Hz
+$$
 
-### 3.3 Amplification Stages
+At 1.2 Hz, each filter has an ideal amplitude transmission of approximately 92.8%.
 
-Two non-inverting LM358 amplifier stages provide signal amplification.
+The second HPF also attenuates the DC offset introduced by the first amplifier stage before further amplification.
+
+Both filters are biased relative to $V_{REF}$ rather than ground.
+
+### 3.3 Non-Inverting Amplifiers
+
+Two non-inverting LM358 amplifier stages are used to amplify the PPG signal.
 
 Each stage uses:
 
-- Feedback resistor: 100 kΩ
-- Gain-setting resistor: 10 kΩ
+| Component | Value |
+|---|---|
+| Feedback Resistor | 100 kΩ |
+| Gain Resistor | 10 kΩ |
 
-The nominal voltage gain is:
+The nominal closed-loop gain is:
 
-\[
-A_v=1+\frac{R_f}{R_g}=11
-\]
+$$
+A_v=1+\frac{R_f}{R_g}
+$$
 
-The two stages therefore provide a nominal cascaded gain of:
+$$
+A_v=1+\frac{100k}{10k}=11
+$$
 
-\[
-A_{v,\mathrm{amp}}=11\times11=121
-\]
+The nominal gain of the two cascaded amplifier stages is:
 
-The actual gain of the complete AFE is lower at 1.2 Hz because of the HPF and LPF frequency responses.
+$$
+A_{v,amp}=11\times11=121
+$$
+
+However, the total AFE gain at 1.2 Hz is lower due to attenuation from the analog filters.
 
 ### 3.4 Low-Pass Filter
 
-A passive RC low-pass filter attenuates higher-frequency interference.
+A first-order passive RC low-pass filter is used at the output stage.
 
-- Resistor: 33 kΩ
-- Capacitor: 1 µF
+| Component | Value |
+|---|---|
+| Resistor | 33 kΩ |
+| Capacitor | 1 µF |
 
-The cutoff frequency is:
+Its cutoff frequency is:
 
-\[
-f_c\approx4.823\,Hz
-\]
+$$
+f_{c,LPF}=\frac{1}{2\pi RC}
+$$
 
-Together, the two HPFs and the LPF produce a band-pass-shaped overall frequency response.
+$$
+f_{c,LPF}
+=\frac{1}{2\pi(33k)(1\mu F)}
+\approx4.823\,Hz
+$$
+
+The LPF preserves most of the 1.2 Hz signal while attenuating higher-frequency components.
+
+Together, the two HPFs and one LPF produce a band-pass-shaped frequency response.
+
+---
 
 ## 4. Simulation Environment
 
-The analog front-end was designed and verified using **PSpice for TI 23.1**.
+The circuit was designed and verified using **PSpice for TI 23.1**.
 
 | Item | Configuration |
 |---|---|
 | Simulation Software | PSpice for TI 23.1 |
 | Op-Amp Model | STMicroelectronics LM358 |
-| Power Supply | 5 V |
+| Supply Voltage | 5 V DC |
 | Simulation Types | Transient, AC Sweep, FFT |
-| Test Input | Simulated PPG waveform |
+| Input Signal | Simulated PPG waveform |
 
 An external LM358 SPICE model and a custom schematic symbol were configured for simulation.
 
-### Simulated PPG Input
+### 4.1 Simulated PPG Signal
 
-A sinusoidal test signal was used to evaluate the circuit before connecting a physical sensor.
+Before physical sensor testing, a sinusoidal source was used to simulate the pulsatile component of a PPG signal.
 
-\[
+$$
 V_{IN}(t)=2+0.005\sin(2\pi\cdot1.2t)
-\]
+$$
 
 | Parameter | Value |
 |---|---|
 | DC Offset | 2 V |
 | AC Amplitude | 5 mV peak |
+| Peak-to-Peak Amplitude | 10 mV |
 | Frequency | 1.2 Hz |
 | Equivalent Heart Rate | 72 BPM |
 
-**Note:** This signal is generated by an ideal simulation source, not measured from a physical KY-039 sensor.
+This test signal is generated by an ideal voltage source and is not an experimentally acquired PPG waveform.
+
+### 4.2 Simulation Procedure
+
+The circuit was validated incrementally before full-system integration.
+
+1. Voltage reference generation
+2. First high-pass filter
+3. First amplification stage
+4. Second high-pass filter
+5. Second amplification stage
+6. Output low-pass filter
+7. Complete AFE transient response
+8. AC frequency response
+9. 50 Hz interference test
+10. FFT analysis
+
+---
 
 ## 5. Simulation Results
 
 ### 5.1 Stage-by-Stage Verification
 
-Each stage was simulated individually before integration into the complete circuit.
+Each circuit stage was verified independently using transient simulation.
 
-| Circuit Stage | Simulation Result |
+| Stage | Simulation Result |
 |---|---|
-| Voltage Reference | 1.66674 V |
-| HPF1 | Approximately 92.8% amplitude transmission at 1.2 Hz |
+| Voltage Reference | 1.666742 V |
+| HPF1 | Approximately 92.8% transmission at 1.2 Hz |
 | Amplifier 1 | Approximately 11× gain |
-| HPF2 | Approximately 92.8% amplitude transmission at 1.2 Hz |
+| HPF2 | Approximately 92.8% transmission at 1.2 Hz |
 | Amplifier 2 | Approximately 11× gain |
-| LPF | Approximately 97.0% amplitude transmission at 1.2 Hz |
+| LPF | Approximately 97.0% transmission at 1.2 Hz |
 
-The results closely matched the theoretical circuit calculations.
+The results were consistent with the theoretical RC filter characteristics and non-inverting amplifier gain equations.
 
-### 5.2 Complete AFE Output
+### 5.2 Complete AFE Transient Response
 
-For a 1.2 Hz sinusoidal input with an amplitude of 5 mV peak:
+For a 1.2 Hz input with a 5 mV peak amplitude, the complete circuit produced an output amplitude of approximately 505 mV peak.
 
 | Parameter | Input | Output |
 |---|---:|---:|
 | Signal Frequency | 1.2 Hz | 1.2 Hz |
-| AC Amplitude | 5 mV peak | Approximately 505 mV peak |
-| Peak-to-Peak Voltage | 10 mV | Approximately 1.01 V |
-| AC Voltage Gain | — | Approximately 101.07× |
+| AC Amplitude | 5 mV peak | 505.35 mV peak |
+| Peak-to-Peak Voltage | 10 mV | 1.0107 V |
+| Voltage Gain | — | Approximately 101.07× |
 
-The complete circuit amplified the simulated PPG component by approximately **101×** while maintaining its waveform.
+The circuit amplified the simulated PPG signal while preserving its sinusoidal waveform.
+
+**Transient Simulation**
+
+![Complete AFE Transient Response](images/transient_response.png)
+
+*Figure 2. Transient response comparing the simulated PPG input and the final analog front-end output.*
+
+The simulated output DC level was approximately 1.702 V, slightly higher than the 1.667 V reference voltage.
+
+This deviation is consistent with the influence of non-ideal operational amplifier characteristics, including input bias currents and offset effects.
 
 ### 5.3 AC Sweep Analysis
 
-An AC sweep from 0.01 Hz to 1 kHz was performed to evaluate the frequency response of the complete circuit.
+An AC sweep was performed from 0.01 Hz to 1 kHz to analyze the frequency response of the complete circuit.
 
-| Frequency | Voltage Gain |
-|---|---:|
-| 1.2 Hz | 40.092 dB |
-| 1.862 Hz | 40.486 dB |
-| 50 Hz | 21.299 dB |
+| Frequency | Voltage Gain | Linear Gain |
+|---|---:|---:|
+| 1.2 Hz | 40.092 dB | 101.07× |
+| 1.862 Hz | 40.486 dB | 105.76× |
+| 50 Hz | 21.299 dB | 11.61× |
 
-The maximum simulated gain occurred near 1.86 Hz.
+The maximum simulated gain occurred near 1.862 Hz.
 
-The overall frequency response confirmed the combined filtering characteristics of the two HPFs and one LPF.
+The result demonstrates a band-pass-shaped frequency response produced by the combined HPF and LPF stages.
+
+**AC Frequency Response**
+
+![AC Sweep Frequency Response](images/ac_sweep.png)
+
+*Figure 3. AC sweep showing the voltage gain of the complete PPG analog front-end across frequency.*
+
+For the idealized RC stages and amplifier gains, the overall magnitude response can be approximated as:
+
+$$
+|H(f)|=
+121
+\left(
+\frac{f}{\sqrt{f^2+f_{c,HPF}^2}}
+\right)^2
+\frac{1}{\sqrt{1+(f/f_{c,LPF})^2}}
+$$
+
+At 1.2 Hz, the theoretical overall gain is approximately 101×, closely matching the simulation result.
 
 ### 5.4 50 Hz Interference Test
 
 A 50 Hz sinusoidal interference component was added to the simulated PPG signal.
 
-\[
-V_{IN}(t)=2
-+0.005\sin(2\pi\cdot1.2t)
-+0.001\sin(2\pi\cdot50t)
-\]
+$$
+V_{IN}(t)=
+2+
+0.005\sin(2\pi\cdot1.2t)+
+0.001\sin(2\pi\cdot50t)
+$$
 
-The FFT results were:
+| Signal Component | Frequency | Input Amplitude |
+|---|---:|---:|
+| Simulated PPG | 1.2 Hz | 5 mV peak |
+| Interference | 50 Hz | 1 mV peak |
+
+The purpose of this test was to evaluate how the analog front-end responds to a high-frequency interference component relative to the desired PPG signal.
+
+**Transient Response with 50 Hz Interference**
+
+![50 Hz Interference Transient Test](images/noise_test.png)
+
+*Figure 4. Time-domain response of the analog front-end with a 50 Hz interference component added to the simulated PPG input.*
+
+### 5.5 FFT Analysis
+
+FFT analysis was performed to compare the 1.2 Hz and 50 Hz frequency components at the input and output.
+
+The steady-state interval from 5 s to 10 s was used for the FFT analysis.
 
 | Frequency Component | Input Amplitude | Output Amplitude |
 |---|---:|---:|
 | 1.2 Hz PPG Signal | 5.00015 mV | 505.357 mV |
 | 50 Hz Interference | 0.99970 mV | 11.607 mV |
 
-The 50 Hz-to-1.2 Hz amplitude ratio decreased from approximately **19.99% at the input** to **2.30% at the output**.
+**FFT — 1.2 Hz Signal**
 
-This corresponds to an improvement of approximately **18.8 dB in the relative interference level**.
+![FFT at 1.2 Hz](images/fft_1p2hz.png)
 
-Although the absolute amplitude of the 50 Hz component increased, it became significantly smaller relative to the desired 1.2 Hz signal.
+*Figure 5. FFT spectrum near 1.2 Hz showing the amplified PPG signal component.*
 
-This result describes rejection of the applied sinusoidal interference relative to the desired signal, rather than a general broadband noise measurement.
+**FFT — 50 Hz Interference**
 
-## 6. Hardware Implementation
+![FFT at 50 Hz](images/fft_50hz.png)
 
-The next phase is to construct the simulated analog circuit on a breadboard.
+*Figure 6. FFT spectrum near 50 Hz showing the remaining interference component.*
 
-### Planned Components
+#### Relative Interference Rejection
 
-- KY-039 optical pulse sensor
-- LM358N dual operational amplifier ICs (2 units)
-- Resistors and capacitors
-- Breadboard and jumper wires
-- Regulated 5 V supply
-- Digital multimeter
-- Oscilloscope
+The interference-to-signal amplitude ratio was evaluated before and after analog conditioning.
 
-### Hardware Verification Plan
+| Measurement | Input | Output |
+|---|---:|---:|
+| 50 Hz / 1.2 Hz Amplitude Ratio | 19.993% | 2.297% |
+| Relative Interference Level | −13.982 dB | −32.778 dB |
 
-1. Measure the actual output characteristics of the KY-039 sensor.
-2. Construct and verify the voltage reference circuit.
-3. Implement HPF1 and the first amplification stage.
-4. Add HPF2 and the second amplification stage.
-5. Implement the output LPF.
-6. Observe the conditioned PPG signal using an oscilloscope.
-7. Compare the experimental results with PSpice simulations.
+The relative interference rejection is:
 
-The complete system will use analog signal conditioning only, without Arduino-based or other digital signal processing.
+$$
+\Delta SIR =
+20\log_{10}
+\left(
+\frac{
+A_{1.2,out}/A_{50,out}
+}{
+A_{1.2,in}/A_{50,in}
+}
+\right)
+$$
 
-## 7. Limitations
+$$
+\boxed{\Delta SIR\approx18.796\,dB}
+$$
 
-The current results are based on circuit simulation.
+The 50 Hz component was not eliminated, and its absolute voltage amplitude increased after amplification.
 
-The following aspects have not yet been experimentally verified:
+However, its amplitude relative to the desired 1.2 Hz signal decreased from approximately 20.0% to 2.3%.
 
-- Actual KY-039 output amplitude and DC offset
-- Hardware noise and electromagnetic interference
-- Component tolerances and breadboard parasitics
-- Differences between the simulated LM358 model and physical LM358N devices
-- Amplifier saturation under real sensor conditions
-- Actual PPG waveform acquisition from a finger
-
-These limitations will be investigated during hardware implementation.
-
-## 8. Project Files
-
-The repository contains the PSpice project files and associated simulation settings.
-
-```text
-PPG_Analog_Front_End.opj
-PPG_ANALOG_FRONT_END.DSN
-PPG_ANALOG_FRONT_END.png
-PPG_Analog_Front_End-PSpiceFiles/
-```
-
-The `.opj` and `.dsn` files contain the PSpice project configuration and schematic designs.
-
-The `PSpiceFiles` directory contains the simulation configurations associated with individual circuit stages.
-
-Simulation-generated output files are generally excluded from Git version control.
-
-### External LM358 Model
-
-This project uses an externally supplied STMicroelectronics LM358 SPICE model and a corresponding custom schematic symbol.
-
-The model and symbol were configured outside the main project directory. Users opening the project on another computer may need to install the model and update the PSpice library references.
-
-Third-party library files are not included unless their redistribution terms permit it.
-
-## 9. Future Work
-
-- [x] Analog front-end circuit design
-- [x] Voltage reference verification
-- [x] HPF and amplifier stage simulations
-- [x] LPF simulation
-- [x] Complete circuit transient simulation
-- [x] AC frequency response analysis
-- [x] 50 Hz interference test
-- [x] FFT frequency analysis
-- [ ] Breadboard circuit implementation
-- [ ] KY-039 sensor characterization
-- [ ] Oscilloscope measurement of real PPG signals
-- [ ] Simulation-to-hardware comparison
-- [ ] Final experimental documentation
-
-## 10. Project Objective
-
-This project aims to develop practical experience in **analog bioelectronic circuit design, small-signal amplification, filtering, SPICE simulation, and experimental verification**.
-
-By progressing from theoretical calculations and circuit simulation to physical implementation, the project explores the engineering challenges involved in acquiring and conditioning biological signals.
+This represents an approximately **18.8 dB improvement in the signal-to-interference ratio** for the two simulated sinusoidal components. It is not a measurement of broadband noise performance.
 
 ---
 
-**Current Stage:** Simulation validated; hardware experiments pending.
+## 6. Hardware Implementation
+
+The next phase is to construct the complete analog front-end using physical components and compare its measured performance with the simulation results.
+
+### Planned Hardware
+
+| Component | Purpose |
+|---|---|
+| KY-039 PPG Sensor | Optical pulse sensing |
+| LM358N (2 ICs) | Reference buffering and signal amplification |
+| Resistors and Capacitors | RC filtering and gain control |
+| Breadboard | Circuit prototyping |
+| Regulated 5 V Supply | Circuit power |
+| Digital Multimeter | DC voltage and continuity measurements |
+| Oscilloscope | Analog waveform measurement |
+
+The two LM358N ICs provide four operational amplifier channels. Three channels are used for reference buffering and signal amplification; the remaining channel will be configured safely as an unused voltage follower.
+
+### Hardware Verification Procedure
+
+1. **Sensor Characterization:** Measure the actual DC level and AC variation of the KY-039 output.
+2. **Voltage Reference:** Construct and verify the 1.667 V reference buffer.
+3. **First Filtering and Amplification:** Implement HPF1 and the first LM358 amplifier stage.
+4. **Second Filtering and Amplification:** Add HPF2 and the second amplification stage.
+5. **Output Filtering:** Implement the final RC low-pass filter.
+6. **Waveform Measurement:** Observe the conditioned PPG signal using an oscilloscope.
+7. **Experimental Comparison:** Compare actual waveforms and measured gains with simulation predictions.
+
+The circuit will be constructed and verified incrementally to isolate potential hardware issues.
+
+**The project uses analog signal conditioning only. No microcontroller, Arduino, or digital signal-processing stage is required.**
+
+---
+
+## 7. Current Limitations
+
+The analog circuit has been validated through PSpice simulation, but physical hardware measurements have not yet been completed.
+
+The current simulation does not establish:
+
+- Actual KY-039 sensor output amplitude or DC level
+- Performance under motion artifacts and ambient light variations
+- Hardware noise and electromagnetic interference
+- Effects of component tolerances and breadboard parasitics
+- Exact performance of physical LM358N devices
+- Absence of output saturation under real sensor conditions
+- Successful acquisition of a real PPG waveform from a finger
+
+These factors will be evaluated during hardware implementation.
+
+---
+
+## 8. Repository Structure
+
+The repository contains the original PSpice project, simulation settings, and documented results.
+
+```text
+PPG-Analog-Front-End/
+│
+├── README.md
+├── .gitignore
+│
+├── PPG_Analog_Front_End.opj
+├── PPG_ANALOG_FRONT_END.DSN
+│
+├── PPG_Analog_Front_End-PSpiceFiles/
+│   └── [PSpice simulation profiles]
+│
+└── images/
+    ├── full_circuit.png
+    ├── transient_response.png
+    ├── ac_sweep.png
+    ├── noise_test.png
+    ├── fft_1p2hz.png
+    └── fft_50hz.png
+```
+
+*The `images/` directory contains selected schematic and simulation figures for documentation. Generated simulation data and temporary files are generally excluded from version control.*
+
+### External LM358 SPICE Model
+
+The project uses an external STMicroelectronics LM358 SPICE model and a custom PSpice schematic symbol.
+
+These files are referenced from a separate library directory in the original Windows development environment.
+
+To reproduce the simulations on another computer:
+
+1. Obtain the appropriate LM358 SPICE model from its authorized source.
+2. Configure the corresponding PSpice schematic symbol.
+3. Update the library paths in the simulation and schematic settings.
+4. Verify the model pin mapping before running the simulations.
+
+Third-party library files should only be redistributed when permitted by their license terms.
+
+---
+
+## 9. Project Progress
+
+### Completed
+
+- [x] PPG analog front-end architecture
+- [x] Voltage reference circuit design
+- [x] HPF and LPF component calculations
+- [x] Two-stage LM358 amplifier design
+- [x] Individual circuit simulations
+- [x] Complete circuit transient verification
+- [x] AC sweep frequency response analysis
+- [x] 50 Hz interference simulation
+- [x] FFT-based frequency component analysis
+
+### Planned
+
+- [ ] Breadboard implementation
+- [ ] KY-039 sensor characterization
+- [ ] Reference voltage hardware verification
+- [ ] Stage-by-stage oscilloscope measurements
+- [ ] Real PPG waveform acquisition
+- [ ] Simulation-to-hardware comparison
+- [ ] Final experimental report
+
+---
+
+## 10. Project Significances
+
+This project provides practical experience in:
+
+- Analog bioelectronic circuit design
+- Small-signal amplification
+- Operational amplifier biasing
+- Passive RC filter design
+- SPICE-based circuit verification
+- Frequency-domain signal analysis
+- Experimental circuit debugging and validation
+
+The long-term objective is to strengthen the hardware foundation required for biological signal acquisition and bioelectronic interface development.
+
+---
+
+**Current Stage:** Simulation validated — hardware implementation pending.
