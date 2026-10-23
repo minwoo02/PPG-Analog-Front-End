@@ -1,0 +1,145 @@
+
+**** 10/23/26 20:10:53 **** PSpice 23.1.0 (30 January 2024) *** ID# 0 ********
+
+ ** Profile: "Full_System_Test-Full_System_AC_Sweep"  [ c:\pspice_workspace\ppg_analog_front_end\ppg_analog_front_end-PSpiceFiles\Ful
+
+
+ ****     CIRCUIT DESCRIPTION
+
+
+******************************************************************************
+
+
+
+
+** Creating circuit file "Full_System_AC_Sweep.cir" 
+** WARNING: THIS AUTOMATICALLY GENERATED FILE MAY BE OVERWRITTEN BY SUBSEQUENT SIMULATIONS
+
+*Libraries: 
+* Profile Libraries :
+* Local Libraries :
+.LIB "c:/pspice_workspace/소자 라이브러리/lm358.lib" 
+* From [PSPICE NETLIST] section of C:\cds_spb_home\cdssetup\OrCAD_PSpiceTIPSpice_Install\23.1.0\PSpice.ini file:
+.lib "nom.lib" 
+.lib "nom_pspti.lib" 
+
+*Analysis directives: 
+.AC DEC 100 0.01 1k
+.OPTIONS ADVCONV
+.OPTIONS FILEMODELSEARCH
+.PROBE64 V(alias(*)) I(alias(*)) W(alias(*)) D(alias(*)) NOISE(alias(*)) 
+.INC "..\Full_System_Test.net" 
+
+
+
+**** INCLUDING Full_System_Test.net ****
+* source PPG_ANALOG_FRONT_END
+R_R5         VOUT OUT2  33k TC=0,0 
+X_U1         VREF N11554 VREF N11148 0 LM358
+R_Rg2         VREF N11920  10k TC=0,0 
+R_Rg1         VREF N11120  10k TC=0,0 
+C_C1         N11554 0  10u  TC=0,0 
+R_Rf1         N11120 OUT1  100k TC=0,0 
+C_C4         OUT1 HP2  1u  TC=0,0 
+R_R1         N11554 N11148  20k TC=0,0 
+R_Rf2         N11920 OUT2  100k TC=0,0 
+C_C2         0 N11148  100n  TC=0,0 
+V_V2         VSIN 0  AC 1
++SIN 2 5m 1.2 0 0 0
+V_V1         N11148 0 5
+R_R2         0 N11554  10k TC=0,0 
+R_R4         VREF HP2  330k TC=0,0 
+X_U3         N11920 HP2 OUT2 N11148 0 LM358
+X_U2         N11120 HP1 OUT1 N11148 0 LM358
+C_C5         VREF VOUT  1u  TC=0,0 
+C_C3         VSIN HP1  1u  TC=0,0 
+R_R3         HP1 VREF  330k TC=0,0 
+
+**** RESUMING Full_System_AC_Sweep.cir ****
+.END
+
+**** 10/23/26 20:10:53 **** PSpice 23.1.0 (30 January 2024) *** ID# 0 ********
+
+ ** Profile: "Full_System_Test-Full_System_AC_Sweep"  [ c:\pspice_workspace\ppg_analog_front_end\ppg_analog_front_end-PSpiceFiles\Ful
+
+
+ ****     Diode MODEL PARAMETERS
+
+
+******************************************************************************
+
+
+
+
+               X_U1.MDTH       X_U3.MDTH       X_U2.MDTH       
+          IS   10.000000E-09   10.000000E-09   10.000000E-09 
+         CJO   10.000000E-15   10.000000E-15   10.000000E-15 
+          KF    3.104131E-15    3.104131E-15    3.104131E-15 
+
+
+INFO(ORPSIM-16627): The following imported models were detected in the design: X_U1.MDTH(lm358.lib), X_U2.MDTH(lm358.lib), X_U3.MDTH(lm358.lib)
+
+ERROR(ORPSIM-16583): More than one imported model containing transistors or diodes is detected. To simulate this circuit, a minimum of 1 and a maximum of 4 traces are required. Reduce the number of traces and simulate again.
+
+
+ABORTING SIMULATION
+**** 10/23/26 20:10:53 **** PSpice 23.1.0 (30 January 2024) *** ID# 0 ********
+
+ ** Profile: "Full_System_Test-Full_System_AC_Sweep"  [ c:\pspice_workspace\ppg_analog_front_end\ppg_analog_front_end-PSpiceFiles\Ful
+
+
+ ****     JOB STATISTICS SUMMARY
+
+
+******************************************************************************
+
+
+
+Node counts:
+  Top level (NUNODS)                =          12
+  External (NCNODS)                 =          66
+  Total (NUMNOD)                    =          66
+
+Total device count (NUMEL)          =         136
+  Capacitors (C)                    =          20
+  Diodes (D)                        =          24
+  VCVS (E)                          =           9
+  CCCS (F)                          =          18
+  CCVS (H)                          =           6
+  Current Sources (I)               =           3
+  Resistors (R)                     =          27
+  Voltage Sources (V)               =          29
+
+Number of subcircuits (X)           =           3
+
+Matrix statistics:
+  Matrix size (NSTOP)               =         110
+  Initial no. elements (NTTAR)      =         325
+  No. elements w/ fillin (NTTBR)    =         325
+  No. fillins (IFILL)               =           0
+  No. overflows (NTTOV)             =           0
+  No. LU operations (IOPS)          =           0
+  Percent sparsity (PERSPA)         =      97.314
+
+Analysis statistics:
+  No. total time points (NUMTTP)    =           0
+  No. rejected time points (NUMRTP) =           0
+  No. iterations (NUMNIT)           =           0
+
+Load Threads                        =           1
+
+Runtime statistics:                       Seconds      Iterations
+  Matrix load                       =        0.00
+  Matrix solution                   =        0.00               1
+  Readin                            =        0.00
+  General setup                     =        0.00
+  CMI setup                     =        0.00
+  Setup                             =        0.00
+  DC sweep                          =        0.00               0
+  Bias point                        =        0.00               0
+  AC and noise                      =        0.00               0
+  Total transient analysis          =        0.00
+  Output                            =        0.00
+  Overhead                          =         .05
+  Total job time (using Solver 1)   =        0.00
+

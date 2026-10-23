@@ -1,0 +1,1 @@
+{"TimeStamp":"Fri Oct 23 02:15:34 2026\n","Circuits":{"ExitCode":"0","TraceCount":"20","Mode":"SPICE","Type":"TIFullMode","Models":[{"ModelName":"X_U1.MDTH","FileName":"c:\\pspice_workspace\\소자 라이브러리\\lm358.lib","ModelType":".model","DeviceType":"d","Source":"FROM_INC","isLibSigned":"false","isAllowed":"true"}]}}

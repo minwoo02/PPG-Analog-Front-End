@@ -1,0 +1,21 @@
+
+# PSpice generated simulation outputs
+*.dat
+*.out
+*.net
+*.cir
+*.als
+*.log
+
+# PSpice backup and temporary files
+*.dbk
+*.DBK
+*.bak
+*.tmp
+
+# Generated database files
+*.db
+
+# Windows
+Thumbs.db
+Desktop.ini

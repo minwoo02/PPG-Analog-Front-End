@@ -1,0 +1,143 @@
+
+**** 10/23/26 19:42:53 **** PSpice 23.1.0 (30 January 2024) *** ID# 0 ********
+
+ ** Profile: "Amplifier2_Test-Amplifier2_Test"  [ c:\pspice_workspace\ppg_analog_front_end\ppg_analog_front_end-PSpiceFiles\Amplifier
+
+
+ ****     CIRCUIT DESCRIPTION
+
+
+******************************************************************************
+
+
+
+
+** Creating circuit file "Amplifier2_Test.cir" 
+** WARNING: THIS AUTOMATICALLY GENERATED FILE MAY BE OVERWRITTEN BY SUBSEQUENT SIMULATIONS
+
+*Libraries: 
+* Profile Libraries :
+* Local Libraries :
+.LIB "c:/pspice_workspace/소자 라이브러리/lm358.lib" 
+* From [PSPICE NETLIST] section of C:\cds_spb_home\cdssetup\OrCAD_PSpiceTIPSpice_Install\23.1.0\PSpice.ini file:
+.lib "nom.lib" 
+.lib "nom_pspti.lib" 
+
+*Analysis directives: 
+.TRAN  0 10 0 5m 
+.OPTIONS ADVCONV
+.OPTIONS FILEMODELSEARCH
+.PROBE64 V(alias(*)) I(alias(*)) W(alias(*)) D(alias(*)) NOISE(alias(*)) 
+.INC "..\Amplifier2_Test.net" 
+
+
+
+**** INCLUDING Amplifier2_Test.net ****
+* source PPG_ANALOG_FRONT_END
+R_Rg1         VREF N06435  10k TC=0,0 
+X_U2         N06435 HP1 OUT1 N06463 0 LM358
+R_R3         HP1 VREF  330k TC=0,0 
+R_R2         0 N06859  10k TC=0,0 
+C_C2         0 N06463  100n  TC=0,0 
+R_Rf1         N06435 OUT1  100k TC=0,0 
+C_C3         N06631 HP1  1u  TC=0,0 
+R_R1         N06859 N06463  20k TC=0,0 
+R_R4         VREF HP2  330k TC=0,0 
+C_C4         OUT1 HP2  1u  TC=0,0 
+X_U1         VREF N06859 VREF N06463 0 LM358
+V_V2         N06631 0  
++SIN 2 5m 1.2 0 0 0
+V_V1         N06463 0 5
+C_C1         N06859 0  10u  TC=0,0 
+X_U3         N08135 HP2 OUT2 N06463 0 LM358
+R_Rf2         N08135 OUT2  100k TC=0,0 
+R_Rg2         VREF N08135  10k TC=0,0 
+
+**** RESUMING Amplifier2_Test.cir ****
+.END
+
+**** 10/23/26 19:42:53 **** PSpice 23.1.0 (30 January 2024) *** ID# 0 ********
+
+ ** Profile: "Amplifier2_Test-Amplifier2_Test"  [ c:\pspice_workspace\ppg_analog_front_end\ppg_analog_front_end-PSpiceFiles\Amplifier
+
+
+ ****     Diode MODEL PARAMETERS
+
+
+******************************************************************************
+
+
+
+
+               X_U2.MDTH       X_U1.MDTH       X_U3.MDTH       
+          IS   10.000000E-09   10.000000E-09   10.000000E-09 
+         CJO   10.000000E-15   10.000000E-15   10.000000E-15 
+          KF    3.104131E-15    3.104131E-15    3.104131E-15 
+
+
+INFO(ORPSIM-16627): The following imported models were detected in the design: X_U1.MDTH(lm358.lib), X_U2.MDTH(lm358.lib), X_U3.MDTH(lm358.lib)
+
+ERROR(ORPSIM-16583): More than one imported model containing transistors or diodes is detected. To simulate this circuit, a minimum of 1 and a maximum of 4 traces are required. Reduce the number of traces and simulate again.
+
+
+ABORTING SIMULATION
+**** 10/23/26 19:42:53 **** PSpice 23.1.0 (30 January 2024) *** ID# 0 ********
+
+ ** Profile: "Amplifier2_Test-Amplifier2_Test"  [ c:\pspice_workspace\ppg_analog_front_end\ppg_analog_front_end-PSpiceFiles\Amplifier
+
+
+ ****     JOB STATISTICS SUMMARY
+
+
+******************************************************************************
+
+
+
+Node counts:
+  Top level (NUNODS)                =          11
+  External (NCNODS)                 =          65
+  Total (NUMNOD)                    =          65
+
+Total device count (NUMEL)          =         134
+  Capacitors (C)                    =          19
+  Diodes (D)                        =          24
+  VCVS (E)                          =           9
+  CCCS (F)                          =          18
+  CCVS (H)                          =           6
+  Current Sources (I)               =           3
+  Resistors (R)                     =          26
+  Voltage Sources (V)               =          29
+
+Number of subcircuits (X)           =           3
+
+Matrix statistics:
+  Matrix size (NSTOP)               =         109
+  Initial no. elements (NTTAR)      =         320
+  No. elements w/ fillin (NTTBR)    =         320
+  No. fillins (IFILL)               =           0
+  No. overflows (NTTOV)             =           0
+  No. LU operations (IOPS)          =           0
+  Percent sparsity (PERSPA)         =      97.307
+
+Analysis statistics:
+  No. total time points (NUMTTP)    =           0
+  No. rejected time points (NUMRTP) =           0
+  No. iterations (NUMNIT)           =           0
+
+Load Threads                        =           1
+
+Runtime statistics:                       Seconds      Iterations
+  Matrix load                       =        0.00
+  Matrix solution                   =        0.00               1
+  Readin                            =         .05
+  General setup                     =        2.03
+  CMI setup                     =        0.00
+  Setup                             =        0.00
+  DC sweep                          =        0.00               0
+  Bias point                        =        0.00               0
+  AC and noise                      =        0.00               0
+  Total transient analysis          =        0.00
+  Output                            =        0.00
+  Overhead                          =         .05
+  Total job time (using Solver 1)   =        2.41
+

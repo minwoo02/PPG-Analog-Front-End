@@ -1,0 +1,44 @@
+
+**** 10/22/26 21:40:00 **** PSpice 23.1.0 (30 January 2024) *** ID# 0 ********
+
+ ** Profile: "SCHEMATIC1-LM358_Symbol_Test"  [ c:\pspice_workspace\PPG_Analog_Front_End\PPG_Analog_Front_End-PSpiceFiles\SCHEMATIC1\L
+
+
+ ****     CIRCUIT DESCRIPTION
+
+
+******************************************************************************
+
+
+
+
+** Creating circuit file "LM358_Symbol_Test.cir" 
+** WARNING: THIS AUTOMATICALLY GENERATED FILE MAY BE OVERWRITTEN BY SUBSEQUENT SIMULATIONS
+
+*Libraries: 
+* Profile Libraries :
+* Local Libraries :
+* From [PSPICE NETLIST] section of C:\cds_spb_home\cdssetup\OrCAD_PSpiceTIPSpice_Install\23.1.0\PSpice.ini file:
+.lib "nom.lib" 
+.lib "nom_pspti.lib" 
+
+*Analysis directives: 
+.TRAN  0 500m 0 1m 
+.OPTIONS ADVCONV
+.OPTIONS FILEMODELSEARCH
+.PROBE64 V(alias(*)) I(alias(*)) W(alias(*)) D(alias(*)) NOISE(alias(*)) 
+.INC "..\SCHEMATIC1.net" 
+
+
+
+**** INCLUDING SCHEMATIC1.net ****
+* source PPG_ANALOG_FRONT_END
+V_V1         N00416 0 5
+V_V2         N00485 0 1.667
+X_U1         N00379 N00485 N00379 N00416 0 LM358
+
+**** RESUMING LM358_Symbol_Test.cir ****
+.END
+
+ERROR(ORPSIM-15108): Subcircuit LM358 used by X_U1 is undefined
+
